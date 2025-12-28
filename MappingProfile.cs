@@ -9,11 +9,18 @@ public class MappingProfile : Profile
         CreateMap<Products, ProductReadDTO>()
             .ForMember(dest => dest.CategoryName,
                        opt => opt.MapFrom(src => src.Category.CategoryName));
+        CreateMap<Employee, EmployeeReadDTO>()
+           .ForMember(dest => dest.RoleName,
+                      opt => opt.MapFrom(src => src.EmployeeRole.RoleName));
+        CreateMap<EmployeeCreateDTO, Employee>()
+    .ForMember(dest => dest.Id, opt => opt.Ignore());
+
 
         CreateMap<ProductCreateDTO, Products>();
         CreateMap<Category, CategoryDTO>();
         CreateMap<CategoryDTO, Category>();
         CreateMap<BranchDTO, Branch>();
         CreateMap<Branch, BranchDTO>();
+        
     }
 }

@@ -3898,11 +3898,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\D_Drive\\RestaurantAPI\\RestaurantAPI.csproj",
+      "projectUniqueName": "C:\\D_Drive\\Restaurant_API\\RestaurantAPI.csproj",
       "projectName": "RestaurantAPI",
-      "projectPath": "C:\\D_Drive\\RestaurantAPI\\RestaurantAPI.csproj",
+      "projectPath": "C:\\D_Drive\\Restaurant_API\\RestaurantAPI.csproj",
       "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-      "outputPath": "C:\\D_Drive\\RestaurantAPI\\obj\\",
+      "outputPath": "C:\\D_Drive\\Restaurant_API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -184,6 +184,22 @@
     ]
   },
   {
+    "ContainingType": "RestaurantAPI.Controllers.LoginController",
+    "Method": "Login",
+    "RelativePath": "api/Login/Login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "RestaurantAPI.Models.DTOs.LoginDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "RestaurantAPI.Controllers.StaffController",
     "Method": "AddEmployees",
     "RelativePath": "api/Staff/AddEmployees",

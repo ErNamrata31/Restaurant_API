@@ -60,6 +60,7 @@ namespace RestaurantAPI.Controllers
             {
                 var branch = _mapper.Map<Branch>(dto);
                 branch.BranchCode = await _branchCodeService.GenerateBranchCodeAsync();
+                branch.Password = "12345";
                 _dbContext.Branches.AddAsync(branch);
                 await _dbContext.SaveChangesAsync();
                 return Ok(new { id = branch.Id, branch });

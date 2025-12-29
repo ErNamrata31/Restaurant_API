@@ -8,6 +8,7 @@ namespace RestaurantAPI.Models.DTOs
         public string? Name { get; set; }
         public string? BranchCode { get; set; }
         public string? Address { get; set; }
+        public string? Password { get; set; }
         public bool? IsDelete { get; set; } = false;
     }
 }

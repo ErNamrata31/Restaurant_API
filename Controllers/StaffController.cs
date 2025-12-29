@@ -41,7 +41,7 @@ namespace RestaurantAPI.Controllers
        {
             try
             {
-                var result = _dbContext.Employees.ToList();
+                var result = _dbContext.Employees.Where(x=>x.IsDeleted==false).ToList();
                 return Ok(result);
             }
             catch (Exception ex)

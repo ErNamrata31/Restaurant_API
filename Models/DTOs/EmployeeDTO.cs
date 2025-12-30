@@ -8,27 +8,29 @@
         public string? ContactNo { get; set; }
         public string? Address { get; set; }
         public string? Position { get; set; }
-        public int RoleId { get; set; }
+        public int empRoleId { get; set; }
         public string? Status { get; set; }
         public decimal Salary { get; set; }
         public bool IsDeleted { get; set; }=false;
+        public string Password { get; set; }
         public bool IsApproved { get; set; }
         public DateOnly? DateOfJoining { get; set; }
 
     }
     public class EmployeeReadDTO
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? Name { get; set; }
         public string? EmailId { get; set; }
         public string? ContactNo { get; set; }
         public string? Address { get; set; }
         public string? Position { get; set; }
-        public int RoleId { get; set; }
+        public int empRoleId { get; set; }
         public string? Status { get; set; }
-        public decimal Salary { get; set; }
-        public bool IsDeleted { get; set; } = false;
+        public decimal? Salary { get; set; }
+        public bool? IsDeleted { get; set; } = false;
         public bool IsApproved { get; set; }
+        public string Password { get; set; }
         public DateOnly? DateOfJoining { get; set; } 
         public string? RoleName { get; set; }
 

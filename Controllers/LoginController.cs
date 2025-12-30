@@ -25,22 +25,46 @@ namespace RestaurantAPI.Controllers
         {
             try
             {
-                string branchCode = dto.UserName ?? string.Empty;
-                string password = dto.Password ?? string.Empty;
-
-                var branch = _dbContext.Branches.FirstOrDefault(x => x.BranchCode == branchCode &&
-                                         x.Password == password && x.IsDelete == false);
-
-                if (branch == null)
-                    return Unauthorized(new ApiResponse<BranchDTO>(401, "User not found", null));
-
-                var branchDto = new BranchDTO
+                if (dto.RoleId != null)
                 {
-                    Id = branch.Id,
-                    BranchCode = branch.BranchCode
-                };
+                    string Emailid = dto.UserName ?? string.Empty;
+                    string password = dto.Password ?? string.Empty;
+                    int RoleId = dto.RoleId ?? 0;
 
-                return Ok(new ApiResponse<BranchDTO>(200, "Login successful", branchDto));
+                    var empdetails = _dbContext.Employees.FirstOrDefault(x => x.EmailId == Emailid &&
+                                             x.Password == password && x.IsDeleted == false && RoleId==x.empRoleId );
+
+                    if (empdetails == null)
+                        return Unauthorized(new ApiResponse<EmployeeReadDTO>(401, "User not found", null));
+
+                    var empDto = new EmployeeReadDTO
+                    {
+                        Id = empdetails.Id,
+                        EmailId = empdetails.EmailId
+                    };
+                    return Ok(new ApiResponse<EmployeeReadDTO>(200, "Login successful", empDto));
+                }
+                else
+                {
+                    string branchCode = dto.UserName ?? string.Empty;
+                    string password = dto.Password ?? string.Empty;
+
+                    var branch = _dbContext.Branches.FirstOrDefault(x => x.BranchCode == branchCode &&
+                                             x.Password == password && x.IsDelete == false);
+
+                    if (branch == null)
+                        return Unauthorized(new ApiResponse<BranchDTO>(401, "User not found", null));
+
+                    var branchDto = new BranchDTO
+                    {
+                        Id = branch.Id,
+                        BranchCode = branch.BranchCode
+                    };
+                    return Ok(new ApiResponse<BranchDTO>(200, "Login successful", branchDto));
+                }
+
+                return null;
+               
             }
             catch (Exception ex)
             {

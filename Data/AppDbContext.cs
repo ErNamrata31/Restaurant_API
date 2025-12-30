@@ -18,7 +18,7 @@ namespace RestaurantAPI.Data
             modelBuilder.Entity<Category>();
             modelBuilder.Entity<Products>();
             modelBuilder.Entity<EmployeeRole>();
-            modelBuilder.Entity<Employee>();
+            modelBuilder.Entity<Employee>().HasOne(e => e.EmployeeRole).WithMany(r => r.Employees).HasForeignKey(e => e.empRoleId); ;
         }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Category> Categories { get; set; }

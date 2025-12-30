@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RestaurantAPI.Data;
 using RestaurantAPI.Models.DTOs;
 using RestaurantAPI.Models.Entities;
@@ -38,10 +39,23 @@ namespace RestaurantAPI.Controllers
         }
         [HttpGet("GetEmployees")]
         public async Task<ActionResult> GetEmployees()
-       {
+        {
             try
             {
-                var result = _dbContext.Employees.Where(x=>x.IsDeleted==false).ToList();
+                var result = await _dbContext.Employees
+                .Where(x => x.IsDeleted == false).Include(x => x.EmployeeRole)
+                 .Select(x => new EmployeeReadDTO
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     EmailId = x.EmailId,
+                     ContactNo = x.ContactNo,
+                     Address = x.Address,
+                     Position = x.Position,
+                     empRoleId = x.empRoleId ?? 0,
+                     Salary = x.Salary,
+                     RoleName = x.EmployeeRole.RoleName
+                 }).ToListAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -52,8 +66,9 @@ namespace RestaurantAPI.Controllers
         [HttpPost("AddEmployees")]
         public async Task<IActionResult> AddEmployees(EmployeeCreateDTO dto)
         {
-            var employee= _mapper.Map<Employee>(dto);
-             _dbContext.Employees.AddAsync(employee);
+            var employee = _mapper.Map<Employee>(dto);
+            employee.Password = "12345";
+            _dbContext.Employees.AddAsync(employee);
             await _dbContext.SaveChangesAsync();
             return Ok(employee);
         }
@@ -65,7 +80,7 @@ namespace RestaurantAPI.Controllers
                 return NotFound();
             employee.IsDeleted = true;
             await _dbContext.SaveChangesAsync();
-            return Ok(new {message="Delete Successful"});
+            return Ok(new { message = "Delete Successful" });
         }
     }
 }

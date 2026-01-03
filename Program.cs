@@ -13,6 +13,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<BranchCodeService>();
 builder.Services.AddScoped<PasswordService>();
+builder.Services.AddScoped<IQRCodeService, QRCodeService>();
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 

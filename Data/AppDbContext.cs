@@ -2,6 +2,7 @@
 using RestaurantAPI.Data.Seed;
 using RestaurantAPI.Models.DTOs;
 using RestaurantAPI.Models.Entities;
+using System.Reflection.Emit;
 
 namespace RestaurantAPI.Data
 {
@@ -18,7 +19,8 @@ namespace RestaurantAPI.Data
             modelBuilder.Entity<Category>();
             modelBuilder.Entity<Products>();
             modelBuilder.Entity<EmployeeRole>();
-            modelBuilder.Entity<Employee>().HasOne(e => e.EmployeeRole).WithMany(r => r.Employees).HasForeignKey(e => e.empRoleId); ;
+            modelBuilder.Entity<Employee>().HasOne(e => e.EmployeeRole).WithMany(r => r.Employees).HasForeignKey(e => e.empRoleId);
+            modelBuilder.Entity<TableRecord>();
         }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -26,6 +28,7 @@ namespace RestaurantAPI.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<EmployeeRole> EmployeeRoles { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<TableRecord> TableRecords { get; set; }
     }
 }
 

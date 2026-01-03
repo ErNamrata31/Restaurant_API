@@ -93,13 +93,13 @@ namespace RestaurantAPI.Migrations
                     b.Property<string>("EmailId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EmployeeRoleId")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PinCode")
@@ -119,7 +119,7 @@ namespace RestaurantAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeRoleId");
+                    b.HasIndex("empRoleId");
 
                     b.ToTable("Employees");
                 });
@@ -160,6 +160,12 @@ namespace RestaurantAPI.Migrations
                             Id = 3,
                             IsDeleted = false,
                             RoleName = "Manager"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsDeleted = false,
+                            RoleName = "Branch"
                         });
                 });
 
@@ -244,11 +250,50 @@ namespace RestaurantAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.TableRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BranchCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsModified")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOccupied")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SeatingCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TableNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("TableQRCode")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("modifiedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TableRecords");
+                });
+
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Employee", b =>
                 {
                     b.HasOne("RestaurantAPI.Models.Entities.EmployeeRole", "EmployeeRole")
                         .WithMany("Employees")
-                        .HasForeignKey("EmployeeRoleId");
+                        .HasForeignKey("empRoleId");
 
                     b.Navigation("EmployeeRole");
                 });

@@ -21,6 +21,10 @@ public class MappingProfile : Profile
         CreateMap<CategoryDTO, Category>();
         CreateMap<BranchDTO, Branch>();
         CreateMap<Branch, BranchDTO>();
-        
+        CreateMap<TableRecord, TableRecordCreateDTO>();
+        CreateMap<TableRecord, TableRecordReadDTO>();
+        CreateMap<TableRecordCreateDTO, TableRecord>();
+        CreateMap<TableRecordReadDTO, TableRecord>();
+
     }
 }

@@ -13,7 +13,7 @@
         public int? StateId { get; set; }
         public int? empRoleId { get; set; }
         public decimal Salary { get; set; }
-        public string Password { get; set; }
+        public string? Password { get; set; }
         public bool? IsDeleted { get; set; }
         public EmployeeRole? EmployeeRole { get; set; }
     }

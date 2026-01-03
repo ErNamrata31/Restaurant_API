@@ -12,8 +12,8 @@ using RestaurantAPI.Data;
 namespace RestaurantAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251226174752_EmpRole")]
-    partial class EmpRole
+    [Migration("20260102121538_updatetable")]
+    partial class updatetable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,9 @@ namespace RestaurantAPI.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BranchCode")
@@ -71,6 +74,57 @@ namespace RestaurantAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Employee", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContactNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmailId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PinCode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Position")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Salary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("empRoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("empRoleId");
+
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("RestaurantAPI.Models.Entities.EmployeeRole", b =>
@@ -109,6 +163,12 @@ namespace RestaurantAPI.Migrations
                             Id = 3,
                             IsDeleted = false,
                             RoleName = "Manager"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IsDeleted = false,
+                            RoleName = "Branch"
                         });
                 });
 
@@ -128,6 +188,9 @@ namespace RestaurantAPI.Migrations
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -190,6 +253,53 @@ namespace RestaurantAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.TableRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BranchCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsModified")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOccupied")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SeatingCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TableNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TableQRCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("modifiedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TableRecords");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Employee", b =>
+                {
+                    b.HasOne("RestaurantAPI.Models.Entities.EmployeeRole", "EmployeeRole")
+                        .WithMany("Employees")
+                        .HasForeignKey("empRoleId");
+
+                    b.Navigation("EmployeeRole");
+                });
+
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Products", b =>
                 {
                     b.HasOne("RestaurantAPI.Models.Entities.Category", "Category")
@@ -204,6 +314,11 @@ namespace RestaurantAPI.Migrations
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.EmployeeRole", b =>
+                {
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

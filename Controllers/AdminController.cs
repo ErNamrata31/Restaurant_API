@@ -2,10 +2,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using RestaurantAPI.Data;
+using RestaurantAPI.Models;
 using RestaurantAPI.Models.DTOs;
 using RestaurantAPI.Models.Entities;
 using RestaurantAPI.Services;
+using System.Reflection.Emit;
 
 namespace RestaurantAPI.Controllers
 {
@@ -17,15 +21,17 @@ namespace RestaurantAPI.Controllers
         private readonly BranchCodeService _branchCodeService;
         private readonly PasswordService _passwordService;
         private readonly IMapper _mapper;
-        public AdminController(AppDbContext context,BranchCodeService branchCodeService, PasswordService passwordService, IMapper mapper)
+        private readonly IQRCodeService _qrCodeService;
+        public AdminController(AppDbContext context, BranchCodeService branchCodeService, PasswordService passwordService, IMapper mapper, IQRCodeService qrCodeService)
         {
             _dbContext = context;
             _branchCodeService = branchCodeService;
             _passwordService = passwordService;
             _mapper = mapper;
+            _qrCodeService = qrCodeService;
         }
         [HttpGet("GetBranch")]
-        public async Task<ActionResult > GetBranch()
+        public async Task<ActionResult> GetBranch()
         {
             try
             {
@@ -36,7 +42,7 @@ namespace RestaurantAPI.Controllers
             {
                 throw new Exception(ex.Message);
             }
-            
+
         }
         [HttpGet("GetBranchById/{id}")]
         public async Task<ActionResult> GetBranchById(int id)
@@ -67,7 +73,7 @@ namespace RestaurantAPI.Controllers
             }
             catch (Exception ex)
             {
-                 throw ex;
+                throw ex;
             }
         }
         [HttpDelete("DeleteBranch/{Id}")]
@@ -75,7 +81,7 @@ namespace RestaurantAPI.Controllers
         {
             try
             {
-                
+
                 var branch = await _dbContext.Branches.FindAsync(Id);
                 if (branch == null)
                     return NotFound();
@@ -91,7 +97,7 @@ namespace RestaurantAPI.Controllers
         }
         [HttpGet("GetCategory")]
         public async Task<ActionResult> GetCategory()
-         {
+        {
             try
             {
                 var category = await _dbContext.Categories.Where(x => x.IsDeleted == false).ToListAsync();
@@ -109,7 +115,7 @@ namespace RestaurantAPI.Controllers
         {
             try
             {
-               var category = _mapper.Map<Category>(dto);
+                var category = _mapper.Map<Category>(dto);
                 _dbContext.Categories.AddAsync(category);
                 await _dbContext.SaveChangesAsync();
                 return Ok(new { id = category.Id, category });
@@ -128,7 +134,7 @@ namespace RestaurantAPI.Controllers
                 if (category == null) return NotFound();
 
                 category.IsDeleted = true;
-               
+
                 await _dbContext.SaveChangesAsync();
 
                 return Ok();
@@ -164,14 +170,18 @@ namespace RestaurantAPI.Controllers
             return Ok(result);
         }
         [HttpGet("GetProductById/{id}")]
-        public async Task<ActionResult<ProductReadDTO>> GetProductById(int id)
+        public async Task<IActionResult> GetProductById(int id)
+        
+        
         {
             try
             {
-                var product = _dbContext.Product.Find(id);
+                var product = await _dbContext.Product.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
                 if (product == null)
-                    return NotFound();
-                return Ok(product);
+                    return NotFound("Product not found");
+
+                var result = _mapper.Map<ProductReadDTO>(product);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -179,7 +189,7 @@ namespace RestaurantAPI.Controllers
             }
         }
         [HttpPost("AddProduct")]
-        public async Task<ActionResult> AddProduct(ProductCreateDTO dto)
+        public async Task<ActionResult> AddProduct([FromForm] ProductCreateDTO dto, IFormFile file)
         {
             try
             {
@@ -195,6 +205,32 @@ namespace RestaurantAPI.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
+        [HttpPut("UpdateProduct")]
+        public async Task<ActionResult> UpdateProduct([FromForm] ProductCreateDTO dto, IFormFile? file)
+        {
+            try
+            {
+                string filepath = "images/Product/";
+                var product = await _dbContext.Product.FindAsync(dto.Id);
+                if (product == null) return NotFound();
+
+                product.ProductName = dto.ProductName;
+                product.Description = dto.Description;
+                product.Price = dto.Price;
+                product.ImageUrl = dto.ImageUrl;
+                product.CategoryId = dto.CategoryId;
+                product.IsActive = dto.IsActive;
+                _dbContext.Product.Update(product);
+                await _dbContext.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         [HttpDelete("DeleteProduct/{Id}")]
         public async Task<ActionResult> DeleteProduct(int Id)
         {
@@ -214,5 +250,103 @@ namespace RestaurantAPI.Controllers
             }
         }
 
+        [HttpGet("GetTable")]
+        public async Task<IActionResult> GetTable()
+        {
+            var tables = await _dbContext.TableRecords
+             .Where(t => !t.IsDeleted)
+             .Select(t => new TableRecordReadDTO
+             {
+                 Id = t.Id,
+                 TableNumber = t.TableNumber,
+                 BranchCode = t.BranchCode,
+                 SeatingCapacity = t.SeatingCapacity,
+                 TableQRCode = Convert.ToBase64String(_qrCodeService.GenerateQrCode(t.TableQRCode)),
+                 IsOccupied = t.IsOccupied
+             })
+             .ToListAsync();
+            var result = _mapper.Map<List<TableRecordReadDTO>>(tables);
+            return Ok(result);
+
+
+        }
+        [HttpGet("GetTableById/{Id}")]
+        public async Task<IActionResult> GetTableById(int Id)
+        {
+            var tables = await _dbContext.TableRecords
+             .Where(t => !t.IsDeleted && t.Id == Id)
+             .Select(t => new TableRecordReadDTO
+             {
+                 Id = t.Id,
+                 TableNumber = t.TableNumber,
+                 BranchCode = t.BranchCode,
+                 SeatingCapacity = t.SeatingCapacity,
+                 TableQRCode = Convert.ToBase64String(_qrCodeService.GenerateQrCode(t.TableQRCode)),
+                 IsOccupied = t.IsOccupied
+             }).ToListAsync();
+            var result = _mapper.Map<List<TableRecordReadDTO>>(tables);
+            return Ok(result);
+
+
+        }
+        [HttpPost("AddTable")]
+        public async Task<ActionResult> AddTable(TableRecordCreateDTO dto)
+        {
+            try
+            {
+                bool tableExists = await _dbContext.TableRecords.AnyAsync(x => x.IsDeleted == false && x.TableNumber == dto.TableNumber);
+                if (tableExists)
+                    return BadRequest(new ApiResponse<TableRecordReadDTO>(400,"Table Number already exists",null ));
+
+                var table = _mapper.Map<TableRecord>(dto);
+                table.TableQRCode = $"http://localhost:4200/products={table.TableNumber}";
+                _dbContext.TableRecords.Add(table);
+                await _dbContext.SaveChangesAsync();
+                return Ok(new ApiResponse<TableRecordReadDTO>(200,"Add Successfull",null));
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        [HttpDelete("TableRemove/{Id}")]
+        public async Task<ActionResult> TableRemove(int Id)
+        {
+            try
+            {
+                var table = await _dbContext.TableRecords.FindAsync(Id);
+                if (table == null) return NotFound();
+                table.IsDeleted = true;
+                await _dbContext.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        [HttpPut("UpdateTable")]
+        public async Task<ActionResult> UpdateTable(TableRecordCreateDTO dto)
+        {
+            try
+            {
+                var table = await _dbContext.TableRecords.FindAsync(dto.Id);
+                if (table == null) return NotFound();
+                table.TableNumber = dto.TableNumber;
+                table.BranchCode = dto.BranchCode;
+                table.SeatingCapacity = dto.SeatingCapacity;
+                table.IsOccupied = dto.IsOccupied;
+                table.IsModified = true;
+                table.modifiedBy = dto.modifiedBy;
+                _dbContext.TableRecords.Update(table);
+                await _dbContext.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

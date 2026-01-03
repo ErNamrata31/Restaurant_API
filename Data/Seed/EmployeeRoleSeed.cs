@@ -10,7 +10,9 @@ namespace RestaurantAPI.Data.Seed
             modelBuilder.Entity<EmployeeRole>().HasData(
                 new EmployeeRole { Id = 1, RoleName = "Waiter" },
                 new EmployeeRole { Id = 2, RoleName = "Kitchen" },
-                new EmployeeRole { Id = 3, RoleName = "Manager" }
+                new EmployeeRole { Id = 3, RoleName = "Manager" },
+                new EmployeeRole { Id = 4, RoleName = "Branch" }
+
             );
         }
     }

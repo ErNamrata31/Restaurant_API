@@ -25,7 +25,7 @@ namespace RestaurantAPI.Controllers
         {
             try
             {
-                if (dto.RoleId != null)
+                if (dto.RoleId != null && dto.RoleId==1)
                 {
                     string Emailid = dto.UserName ?? string.Empty;
                     string password = dto.Password ?? string.Empty;
@@ -40,11 +40,12 @@ namespace RestaurantAPI.Controllers
                     var empDto = new EmployeeReadDTO
                     {
                         Id = empdetails.Id,
-                        EmailId = empdetails.EmailId
+                        EmailId = empdetails.EmailId,
+                        empRoleId=empdetails.empRoleId
                     };
                     return Ok(new ApiResponse<EmployeeReadDTO>(200, "Login successful", empDto));
                 }
-                else
+                else if(dto.RoleId != null && dto.RoleId==4)
                 {
                     string branchCode = dto.UserName ?? string.Empty;
                     string password = dto.Password ?? string.Empty;

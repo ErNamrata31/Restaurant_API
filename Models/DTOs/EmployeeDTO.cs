@@ -25,7 +25,7 @@
         public string? ContactNo { get; set; }
         public string? Address { get; set; }
         public string? Position { get; set; }
-        public int empRoleId { get; set; }
+        public int? empRoleId { get; set; }
         public string? Status { get; set; }
         public decimal? Salary { get; set; }
         public bool? IsDeleted { get; set; } = false;

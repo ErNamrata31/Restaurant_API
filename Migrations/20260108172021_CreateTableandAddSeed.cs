@@ -7,7 +7,7 @@
 namespace RestaurantAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CreateTableandAddSeed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,6 +58,45 @@ namespace RestaurantAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MenuMasters",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MenuName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuMasters", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoleRights",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    MenuId = table.Column<int>(type: "int", nullable: true),
+                    SubMenuId = table.Column<int>(type: "int", nullable: true),
+                    CanView = table.Column<bool>(type: "bit", nullable: true),
+                    CanAdd = table.Column<bool>(type: "bit", nullable: true),
+                    CanEdit = table.Column<bool>(type: "bit", nullable: true),
+                    CanDelete = table.Column<bool>(type: "bit", nullable: true),
+                    CanUpdate = table.Column<bool>(type: "bit", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleRights", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -77,14 +116,14 @@ namespace RestaurantAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TableNumber = table.Column<int>(type: "int", nullable: false),
-                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SeatingCapacity = table.Column<int>(type: "int", nullable: false),
+                    TableNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SeatingCapacity = table.Column<int>(type: "int", nullable: true),
                     TableQRCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsOccupied = table.Column<bool>(type: "bit", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    modifiedBy = table.Column<int>(type: "int", nullable: false),
-                    IsModified = table.Column<bool>(type: "bit", nullable: false)
+                    IsOccupied = table.Column<bool>(type: "bit", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    modifiedBy = table.Column<int>(type: "int", nullable: true),
+                    IsModified = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -99,10 +138,10 @@ namespace RestaurantAPI.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -112,8 +151,7 @@ namespace RestaurantAPI.Migrations
                         name: "FK_Product_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -145,6 +183,31 @@ namespace RestaurantAPI.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SubMenuMasters",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubMenuName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MenuId = table.Column<int>(type: "int", nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    MenuMasterId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubMenuMasters", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubMenuMasters_MenuMasters_MenuMasterId",
+                        column: x => x.MenuMasterId,
+                        principalTable: "MenuMasters",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 table: "EmployeeRoles",
                 columns: new[] { "Id", "IsDeleted", "RoleName" },
@@ -152,7 +215,8 @@ namespace RestaurantAPI.Migrations
                 {
                     { 1, false, "Waiter" },
                     { 2, false, "Kitchen" },
-                    { 3, false, "Manager" }
+                    { 3, false, "Manager" },
+                    { 4, false, "Branch" }
                 });
 
             migrationBuilder.InsertData(
@@ -182,6 +246,11 @@ namespace RestaurantAPI.Migrations
                 name: "IX_Product_CategoryId",
                 table: "Product",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubMenuMasters_MenuMasterId",
+                table: "SubMenuMasters",
+                column: "MenuMasterId");
         }
 
         /// <inheritdoc />
@@ -197,7 +266,13 @@ namespace RestaurantAPI.Migrations
                 name: "Product");
 
             migrationBuilder.DropTable(
+                name: "RoleRights");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "SubMenuMasters");
 
             migrationBuilder.DropTable(
                 name: "TableRecords");
@@ -207,6 +282,9 @@ namespace RestaurantAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "MenuMasters");
         }
     }
 }

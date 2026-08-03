@@ -165,8 +165,10 @@ namespace RestaurantAPI.Controllers
             var products = await _dbContext.Product
              .Where(p => !p.IsDeleted)
              .ToListAsync();
+            
 
             var result = _mapper.Map<List<ProductReadDTO>>(products);
+            
             return Ok(result);
         }
         [HttpGet("GetProductById/{id}")]
@@ -189,11 +191,24 @@ namespace RestaurantAPI.Controllers
             }
         }
         [HttpPost("AddProduct")]
-        public async Task<ActionResult> AddProduct([FromForm] ProductCreateDTO dto, IFormFile file)
+        public async Task<ActionResult> AddProduct([FromForm(Name ="dto")] ProductCreateDTO dto, IFormFile file)
         {
             try
             {
                 var product = _mapper.Map<Products>(dto);
+                if(file!=null&& file.Length>0)
+                {
+                    var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "ProductImage");
+                    if (!Directory.Exists(uploadFolder))
+                        Directory.CreateDirectory(uploadFolder);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var filePath = Path.Combine(uploadFolder, fileName);
+                    using(var stream= new FileStream(filePath,FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    product.ImageUrl = "/ProductImage/" + fileName;
+                }
                 _dbContext.Product.Add(product);
                 await _dbContext.SaveChangesAsync();
 
@@ -206,30 +221,96 @@ namespace RestaurantAPI.Controllers
             }
         }
 
-        [HttpPut("UpdateProduct")]
-        public async Task<ActionResult> UpdateProduct([FromForm] ProductCreateDTO dto, IFormFile? file)
-        {
-            try
-            {
-                string filepath = "images/Product/";
-                var product = await _dbContext.Product.FindAsync(dto.Id);
-                if (product == null) return NotFound();
+        //[HttpPut("UpdateProduct")]
+        //public async Task<IActionResult> UpdateProduct([FromForm(Name ="dto")] ProductCreateDTO dto, IFormFile? file)
+        //{
+        //    try
+        //    {
 
-                product.ProductName = dto.ProductName;
-                product.Description = dto.Description;
-                product.Price = dto.Price;
-                product.ImageUrl = dto.ImageUrl;
-                product.CategoryId = dto.CategoryId;
-                product.IsActive = dto.IsActive;
-                _dbContext.Product.Update(product);
-                await _dbContext.SaveChangesAsync();
-                return Ok();
-            }
-            catch (Exception ex)
+        //        var product = await _dbContext.Product.FindAsync(dto.Id);
+        //        if (product == null) return NotFound();
+        //        _mapper.Map(dto, product);
+        //        if(file!=null && file.Length>0)
+        //        {
+        //            if(!string.IsNullOrEmpty(product.ImageUrl))
+        //            {
+        //                var oldPath=Path.Combine(Directory.GetCurrentDirectory(),"wwwroot",product.ImageUrl.TrimStart('/'));
+        //                if(System.IO.File.Exists(oldPath))
+        //                {
+        //                    System.IO.File.Delete(oldPath);
+        //                }
+        //            }
+        //        }
+        //        var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "ProductImage");
+        //        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+        //        var filePath=Path.Combine(uploadFolder, fileName);
+        //        using (var stream = new FileStream(filePath,FileMode.Create))
+        //        {
+        //            await file.CopyToAsync(stream);
+        //        }
+        //        product.ImageUrl = "/Images/" + fileName;
+        //        product.ProductName = dto.ProductName;
+        //        product.Description = dto.Description;
+        //        product.Price = dto.Price;
+        //        product.ImageUrl = dto.ImageUrl;
+        //        product.CategoryId = dto.CategoryId;
+        //        product.IsActive = dto.IsActive;
+        //        _dbContext.Product.Update(product);
+        //        await _dbContext.SaveChangesAsync();
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
+
+        [HttpPut("UpdateProduct")]
+        public async Task<IActionResult> UpdateProduct(
+    [FromForm(Name = "dto")] ProductCreateDTO dto,
+    IFormFile? file)
+        {
+            var product = await _dbContext.Product.FindAsync(dto.Id);
+            if (product == null) return NotFound();
+
+            _mapper.Map(dto, product);
+
+            if (file != null && file.Length > 0)
             {
-                throw new Exception(ex.Message);
+               
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    var oldPath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "ProductImage",
+                        product.ImageUrl.TrimStart('/')
+                    );
+
+                    if (System.IO.File.Exists(oldPath))
+                        System.IO.File.Delete(oldPath);
+                }
+
+                var uploadFolder = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "ProductImage"
+                );
+
+                if (!Directory.Exists(uploadFolder))
+                    Directory.CreateDirectory(uploadFolder);
+
+                var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                var filePath = Path.Combine(uploadFolder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                product.ImageUrl = "/ProductImage/" + fileName;
             }
+
+            await _dbContext.SaveChangesAsync();
+            return Ok();
         }
+
 
         [HttpDelete("DeleteProduct/{Id}")]
         public async Task<ActionResult> DeleteProduct(int Id)
@@ -254,7 +335,7 @@ namespace RestaurantAPI.Controllers
         public async Task<IActionResult> GetTable()
         {
             var tables = await _dbContext.TableRecords
-             .Where(t => !t.IsDeleted)
+             .Where(t => t.IsDeleted == false)
              .Select(t => new TableRecordReadDTO
              {
                  Id = t.Id,
@@ -274,14 +355,14 @@ namespace RestaurantAPI.Controllers
         public async Task<IActionResult> GetTableById(int Id)
         {
             var tables = await _dbContext.TableRecords
-             .Where(t => !t.IsDeleted && t.Id == Id)
+             .Where(t => t.IsDeleted == false && t.Id == Id)
              .Select(t => new TableRecordReadDTO
              {
                  Id = t.Id,
                  TableNumber = t.TableNumber,
                  BranchCode = t.BranchCode,
                  SeatingCapacity = t.SeatingCapacity,
-                 TableQRCode = Convert.ToBase64String(_qrCodeService.GenerateQrCode(t.TableQRCode)),
+                 // TableQRCode = Convert.ToBase64String(_qrCodeService.GenerateQrCode(t.TableQRCode)),
                  IsOccupied = t.IsOccupied
              }).ToListAsync();
             var result = _mapper.Map<List<TableRecordReadDTO>>(tables);
@@ -296,13 +377,13 @@ namespace RestaurantAPI.Controllers
             {
                 bool tableExists = await _dbContext.TableRecords.AnyAsync(x => x.IsDeleted == false && x.TableNumber == dto.TableNumber);
                 if (tableExists)
-                    return BadRequest(new ApiResponse<TableRecordReadDTO>(400,"Table Number already exists",null ));
+                    return BadRequest(new ApiResponse<TableRecordReadDTO>(400, "Table Number already exists", null));
 
                 var table = _mapper.Map<TableRecord>(dto);
                 table.TableQRCode = $"http://localhost:4200/products={table.TableNumber}";
                 _dbContext.TableRecords.Add(table);
                 await _dbContext.SaveChangesAsync();
-                return Ok(new ApiResponse<TableRecordReadDTO>(200,"Add Successfull",null));
+                return Ok(new ApiResponse<TableRecordReadDTO>(200, "Add Successfull", null));
 
             }
             catch (Exception ex)

@@ -12,7 +12,7 @@
         public string? Status { get; set; }
         public decimal Salary { get; set; }
         public bool IsDeleted { get; set; }=false;
-        public string Password { get; set; }
+        public string? Password { get; set; }
         public bool IsApproved { get; set; }
         public DateOnly? DateOfJoining { get; set; }
 

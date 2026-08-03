@@ -25,7 +25,7 @@ namespace RestaurantAPI.Controllers
         {
             try
             {
-                if (dto.RoleId != null && dto.RoleId==1)
+                if (dto.RoleId != null && dto.RoleId==1 || dto.RoleId==3)
                 {
                     string Emailid = dto.UserName ?? string.Empty;
                     string password = dto.Password ?? string.Empty;

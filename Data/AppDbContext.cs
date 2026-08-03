@@ -21,6 +21,9 @@ namespace RestaurantAPI.Data
             modelBuilder.Entity<EmployeeRole>();
             modelBuilder.Entity<Employee>().HasOne(e => e.EmployeeRole).WithMany(r => r.Employees).HasForeignKey(e => e.empRoleId);
             modelBuilder.Entity<TableRecord>();
+            modelBuilder.Entity<MenuMaster>();
+            modelBuilder.Entity<SubMenuMaster>();
+            modelBuilder.Entity<RoleRight>();
         }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -29,6 +32,11 @@ namespace RestaurantAPI.Data
         public DbSet<EmployeeRole> EmployeeRoles { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<TableRecord> TableRecords { get; set; }
+        public DbSet<MenuMaster> MenuMasters { get; set; }
+        public DbSet<SubMenuMaster> SubMenuMasters { get; set; }
+        public DbSet<RoleRight> RoleRights { get; set; }
+
+
     }
 }
 

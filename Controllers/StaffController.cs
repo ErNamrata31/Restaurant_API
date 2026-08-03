@@ -37,6 +37,15 @@ namespace RestaurantAPI.Controllers
                 throw new Exception(ex.Message);
             }
         }
+        [HttpGet("GetEmpById/{Id}")]
+        public async Task<ActionResult> GetEmpById(int Id)
+        {
+            var empList = _dbContext.Employees.Include(y => y.EmployeeRole).FirstOrDefault(x => x.Id == Id);
+            if (empList == null)
+                return NotFound();
+            var result = _mapper.Map<EmployeeReadDTO>(empList);
+            return Ok(result);
+        }
         [HttpGet("GetEmployees")]
         public async Task<ActionResult> GetEmployees()
         {
@@ -71,6 +80,17 @@ namespace RestaurantAPI.Controllers
             _dbContext.Employees.AddAsync(employee);
             await _dbContext.SaveChangesAsync();
             return Ok(employee);
+        }
+        [HttpPut("UpdateEmp")]
+        public async Task<ActionResult> UpdateEmp(EmployeeCreateDTO dto)
+        {
+            var emp = await _dbContext.Employees.FindAsync(dto.Id);
+            if (emp == null)
+                return NotFound();
+            _mapper.Map(dto, emp);
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+
         }
         [HttpDelete("DeleteEmp/{Id}")]
         public async Task<IActionResult> DeleteEmp(int Id)

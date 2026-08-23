@@ -152,7 +152,6 @@ C:\D_Drive\RestaurantAPI\obj\Debug\net8.0\RestaurantAPI.genruntimeconfig.cache
 C:\D_Drive\RestaurantAPI\obj\Debug\net8.0\ref\RestaurantAPI.dll
 C:\D_Drive\Restaurant_API\bin\Debug\net8.0\appsettings.Development.json
 C:\D_Drive\Restaurant_API\bin\Debug\net8.0\appsettings.json
-C:\D_Drive\Restaurant_API\bin\Debug\net8.0\RestaurantAPI.staticwebassets.runtime.json
 C:\D_Drive\Restaurant_API\bin\Debug\net8.0\RestaurantAPI.staticwebassets.endpoints.json
 C:\D_Drive\Restaurant_API\bin\Debug\net8.0\RestaurantAPI.exe
 C:\D_Drive\Restaurant_API\bin\Debug\net8.0\RestaurantAPI.deps.json
@@ -303,10 +302,11 @@ C:\D_Drive\Restaurant_API\obj\Debug\net8.0\staticwebassets.build.json
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\staticwebassets.development.json
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-C:\D_Drive\Restaurant_API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\Restaura.740C9932.Up2Date
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\RestaurantAPI.dll
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\refint\RestaurantAPI.dll
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\RestaurantAPI.pdb
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\RestaurantAPI.genruntimeconfig.cache
 C:\D_Drive\Restaurant_API\obj\Debug\net8.0\ref\RestaurantAPI.dll
+C:\D_Drive\Restaurant_API\obj\Debug\net8.0\swae.build.ex.cache
+C:\D_Drive\Restaurant_API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

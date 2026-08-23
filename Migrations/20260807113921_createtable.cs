@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace RestaurantAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateTableandAddSeed : Migration
+    public partial class createtable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,27 +74,6 @@ namespace RestaurantAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MenuMasters", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RoleRights",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    MenuId = table.Column<int>(type: "int", nullable: true),
-                    SubMenuId = table.Column<int>(type: "int", nullable: true),
-                    CanView = table.Column<bool>(type: "bit", nullable: true),
-                    CanAdd = table.Column<bool>(type: "bit", nullable: true),
-                    CanEdit = table.Column<bool>(type: "bit", nullable: true),
-                    CanDelete = table.Column<bool>(type: "bit", nullable: true),
-                    CanUpdate = table.Column<bool>(type: "bit", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RoleRights", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -208,6 +188,123 @@ namespace RestaurantAPI.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Carts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    tableId = table.Column<int>(type: "int", nullable: false),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    createdAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Carts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Carts_TableRecords_tableId",
+                        column: x => x.tableId,
+                        principalTable: "TableRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    tableId = table.Column<int>(type: "int", nullable: false),
+                    totalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    createdAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_TableRecords_tableId",
+                        column: x => x.tableId,
+                        principalTable: "TableRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoleRights",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    MenuId = table.Column<int>(type: "int", nullable: true),
+                    SubMenuId = table.Column<int>(type: "int", nullable: true),
+                    CanView = table.Column<bool>(type: "bit", nullable: true),
+                    CanAdd = table.Column<bool>(type: "bit", nullable: true),
+                    CanEdit = table.Column<bool>(type: "bit", nullable: true),
+                    CanDelete = table.Column<bool>(type: "bit", nullable: true),
+                    CanUpdate = table.Column<bool>(type: "bit", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    SubMenuMasterId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleRights", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RoleRights_SubMenuMasters_SubMenuMasterId",
+                        column: x => x.SubMenuMasterId,
+                        principalTable: "SubMenuMasters",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CartItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    cartId = table.Column<int>(type: "int", nullable: false),
+                    productId = table.Column<int>(type: "int", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CartsId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CartItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CartItems_Carts_CartsId",
+                        column: x => x.CartsId,
+                        principalTable: "Carts",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    orderId = table.Column<int>(type: "int", nullable: false),
+                    productId = table.Column<int>(type: "int", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    PriceAtPurchase = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ItemStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    notes = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Orders_orderId",
+                        column: x => x.orderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "EmployeeRoles",
                 columns: new[] { "Id", "IsDeleted", "RoleName" },
@@ -238,14 +335,40 @@ namespace RestaurantAPI.Migrations
                 filter: "[BranchCode] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CartItems_CartsId",
+                table: "CartItems",
+                column: "CartsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Carts_tableId",
+                table: "Carts",
+                column: "tableId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Employees_empRoleId",
                 table: "Employees",
                 column: "empRoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderItem_orderId",
+                table: "OrderItem",
+                column: "orderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_tableId",
+                table: "Orders",
+                column: "tableId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Product_CategoryId",
                 table: "Product",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoleRights_SubMenuMasterId",
+                table: "RoleRights",
+                column: "SubMenuMasterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubMenuMasters_MenuMasterId",
@@ -260,7 +383,13 @@ namespace RestaurantAPI.Migrations
                 name: "Branches");
 
             migrationBuilder.DropTable(
+                name: "CartItems");
+
+            migrationBuilder.DropTable(
                 name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "OrderItem");
 
             migrationBuilder.DropTable(
                 name: "Product");
@@ -272,16 +401,22 @@ namespace RestaurantAPI.Migrations
                 name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "SubMenuMasters");
-
-            migrationBuilder.DropTable(
-                name: "TableRecords");
+                name: "Carts");
 
             migrationBuilder.DropTable(
                 name: "EmployeeRoles");
 
             migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "SubMenuMasters");
+
+            migrationBuilder.DropTable(
+                name: "TableRecords");
 
             migrationBuilder.DropTable(
                 name: "MenuMasters");

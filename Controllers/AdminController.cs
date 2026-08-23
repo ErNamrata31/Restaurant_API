@@ -380,7 +380,7 @@ namespace RestaurantAPI.Controllers
                     return BadRequest(new ApiResponse<TableRecordReadDTO>(400, "Table Number already exists", null));
 
                 var table = _mapper.Map<TableRecord>(dto);
-                table.TableQRCode = $"http://localhost:4200/products={table.TableNumber}";
+                table.TableQRCode = $"http://localhost:4200/customer/{table.TableNumber}";
                 _dbContext.TableRecords.Add(table);
                 await _dbContext.SaveChangesAsync();
                 return Ok(new ApiResponse<TableRecordReadDTO>(200, "Add Successfull", null));

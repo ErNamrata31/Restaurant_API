@@ -54,6 +54,63 @@ namespace RestaurantAPI.Migrations
                     b.ToTable("Branches");
                 });
 
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.CartItems", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CartsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("cartId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("productId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CartsId");
+
+                    b.ToTable("CartItems");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Carts", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("tableId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("tableId")
+                        .IsUnique();
+
+                    b.ToTable("Carts");
+                });
+
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Category", b =>
                 {
                     b.Property<int?>("Id")
@@ -200,6 +257,73 @@ namespace RestaurantAPI.Migrations
                     b.ToTable("MenuMasters");
                 });
 
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.OrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ItemStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PriceAtPurchase")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("orderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("productId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("orderId");
+
+                    b.ToTable("OrderItem");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Orders", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("OrderStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("tableId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("totalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("tableId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Products", b =>
                 {
                     b.Property<int>("Id")
@@ -313,10 +437,15 @@ namespace RestaurantAPI.Migrations
                     b.Property<int?>("SubMenuId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SubMenuMasterId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubMenuMasterId");
 
                     b.ToTable("RoleRights");
                 });
@@ -397,6 +526,24 @@ namespace RestaurantAPI.Migrations
                     b.ToTable("TableRecords");
                 });
 
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.CartItems", b =>
+                {
+                    b.HasOne("RestaurantAPI.Models.Entities.Carts", null)
+                        .WithMany("CartItems")
+                        .HasForeignKey("CartsId");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Carts", b =>
+                {
+                    b.HasOne("RestaurantAPI.Models.Entities.TableRecord", "TableRecord")
+                        .WithOne("Carts")
+                        .HasForeignKey("RestaurantAPI.Models.Entities.Carts", "tableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TableRecord");
+                });
+
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Employee", b =>
                 {
                     b.HasOne("RestaurantAPI.Models.Entities.EmployeeRole", "EmployeeRole")
@@ -404,6 +551,28 @@ namespace RestaurantAPI.Migrations
                         .HasForeignKey("empRoleId");
 
                     b.Navigation("EmployeeRole");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.OrderItem", b =>
+                {
+                    b.HasOne("RestaurantAPI.Models.Entities.Orders", "Orders")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("orderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Orders", b =>
+                {
+                    b.HasOne("RestaurantAPI.Models.Entities.TableRecord", "TableRecord")
+                        .WithMany("Orders")
+                        .HasForeignKey("tableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TableRecord");
                 });
 
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Products", b =>
@@ -415,6 +584,15 @@ namespace RestaurantAPI.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.RoleRight", b =>
+                {
+                    b.HasOne("RestaurantAPI.Models.Entities.SubMenuMaster", "SubMenuMaster")
+                        .WithMany("RoleRights")
+                        .HasForeignKey("SubMenuMasterId");
+
+                    b.Navigation("SubMenuMaster");
+                });
+
             modelBuilder.Entity("RestaurantAPI.Models.Entities.SubMenuMaster", b =>
                 {
                     b.HasOne("RestaurantAPI.Models.Entities.MenuMaster", "MenuMaster")
@@ -422,6 +600,11 @@ namespace RestaurantAPI.Migrations
                         .HasForeignKey("MenuMasterId");
 
                     b.Navigation("MenuMaster");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Carts", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("RestaurantAPI.Models.Entities.Category", b =>
@@ -437,6 +620,24 @@ namespace RestaurantAPI.Migrations
             modelBuilder.Entity("RestaurantAPI.Models.Entities.MenuMaster", b =>
                 {
                     b.Navigation("SubMenuMasters");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.Orders", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.SubMenuMaster", b =>
+                {
+                    b.Navigation("RoleRights");
+                });
+
+            modelBuilder.Entity("RestaurantAPI.Models.Entities.TableRecord", b =>
+                {
+                    b.Navigation("Carts")
+                        .IsRequired();
+
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

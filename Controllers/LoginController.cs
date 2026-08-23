@@ -31,8 +31,8 @@ namespace RestaurantAPI.Controllers
                     string password = dto.Password ?? string.Empty;
                     int RoleId = dto.RoleId ?? 0;
 
-                    var empdetails = _dbContext.Employees.FirstOrDefault(x => x.EmailId == Emailid &&
-                                             x.Password == password && x.IsDeleted == false && RoleId==x.empRoleId );
+                    var empdetails = _dbContext.Employees.FirstOrDefault(x => x.EmailId.Trim() == Emailid.Trim() &&
+                                             x.Password == password && x.IsDeleted == false && x.empRoleId==RoleId );
 
                     if (empdetails == null)
                         return Unauthorized(new ApiResponse<EmployeeReadDTO>(401, "User not found", null));
